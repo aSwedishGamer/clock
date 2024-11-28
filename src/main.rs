@@ -1,3 +1,4 @@
+#![windows_subsystem = "windows"]
 use freya::prelude::*;
 use std::{
     fs,
