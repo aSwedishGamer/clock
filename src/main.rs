@@ -67,7 +67,7 @@ fn app() -> Element {
     let mut time_zone = use_signal(read_file);
     let time = format_time(&system_time.read(), *time_zone.read());
 
-    fs::write("time_zone.txt", time_zone.read().to_string()).expect("failed to write file");
+    use_effect(move || fs::write("time_zone.txt", time_zone.read().to_string()).expect("failed to write file"));
 
     rsx!(
         rect {
