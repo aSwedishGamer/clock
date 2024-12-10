@@ -7,18 +7,16 @@ use std::{
 };
 
 fn read_file() -> i8 {
-    let file = fs::read_to_string("time_zone.txt");
-    let file = match file {
-        Ok(file) => file,
+    match fs::read_to_string("time_zone.txt") {
+        Ok(file) => file.parse().unwrap(),
         Err(error) => match error.kind() {
             ErrorKind::NotFound => match fs::write("time_zone.txt", "0") {
-                Ok(()) => "0".to_owned(),
+                Ok(()) => 0,
                 Err(_error) => panic!("Failed to create file {:?}", _error),
             },
             other_error => panic!("{}", other_error),
         },
-    };
-    file.parse().unwrap()
+    }
 }
 
 fn add_zero(time: i64) -> String {
@@ -67,7 +65,9 @@ fn app() -> Element {
     let mut time_zone = use_signal(read_file);
     let time = format_time(&system_time.read(), *time_zone.read());
 
-    use_effect(move || fs::write("time_zone.txt", time_zone.read().to_string()).expect("failed to write file"));
+    use_effect(move || {
+        fs::write("time_zone.txt", time_zone.read().to_string()).expect("failed to write file")
+    });
 
     rsx!(
         rect {
