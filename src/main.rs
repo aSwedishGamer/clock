@@ -114,16 +114,17 @@ fn app() -> Element {
     )
 }
 
+const WIDTH: f64 = 500.0;
+const HEIGHT: f64 = 400.0;
+
 fn main() {
-    let width = 500.0;
-    let height = 400.0;
     launch_cfg(
         app,
         LaunchConfig::<()>::builder()
-            .with_width(width)
-            .with_height(height)
-            .with_min_width(width)
-            .with_min_height(height)
+            .with_width(WIDTH)
+            .with_height(HEIGHT)
+            .with_min_width(WIDTH)
+            .with_min_height(HEIGHT)
             .with_title("Clock")
             .build(),
     );
