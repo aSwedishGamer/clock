@@ -20,12 +20,13 @@ fn read_file() -> i8 {
 }
 
 fn add_zero(time: i64) -> String {
-    if time.to_string().len() == 1 {
+    let time = time.to_string();
+    if time.len() == 1 {
         let mut zero = "0".to_owned();
-        zero.push_str(&time.to_string());
+        zero.push_str(&time);
         zero
     } else {
-        time.to_string()
+        time
     }
 }
 
@@ -43,10 +44,11 @@ fn negative_add_zero(time: i64) -> String {
 fn format_time(time: &SystemTime, time_zone: i8) -> String {
     let current_time =
         time_zone as i64 * 3600 + time.duration_since(UNIX_EPOCH).unwrap().as_secs() as i64;
-    let seconds = add_zero(current_time.rem_euclid(60));
-    let minutes = add_zero(current_time.rem_euclid(3600) / 60);
-    let hours = add_zero(current_time.rem_euclid(86400) / 3600);
-    hours + ":" + &minutes + ":" + &seconds
+    add_zero(current_time.rem_euclid(86400) / 3600)
+        + ":"
+        + &add_zero(current_time.rem_euclid(3600) / 60)
+        + ":"
+        + &add_zero(current_time.rem_euclid(60))
 }
 
 fn app() -> Element {
@@ -54,7 +56,6 @@ fn app() -> Element {
     use_effect(move || {
         spawn(async move {
             let mut interval = tokio::time::interval(Duration::from_millis(500));
-
             loop {
                 interval.tick().await;
                 system_time.set(SystemTime::now());
@@ -63,7 +64,6 @@ fn app() -> Element {
     });
 
     let mut time_zone = use_signal(read_file);
-    let time = format_time(&system_time.read(), *time_zone.read());
 
     use_effect(move || {
         fs::write("time_zone.txt", time_zone.read().to_string()).expect("failed to write file")
@@ -107,7 +107,7 @@ fn app() -> Element {
                     font_family: "Consolas",
                     text_align: "center",
                     font_size: "100",
-                    "{time}"
+                    "{format_time(&system_time.read(), *time_zone.read())}"
                 }
             }
         }
